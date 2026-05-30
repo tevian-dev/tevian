@@ -16,7 +16,6 @@ anime, gaming y cultura geek.
 
 - React
 - Node.js
-- PostgreSQL
 
 ## Estado
 
