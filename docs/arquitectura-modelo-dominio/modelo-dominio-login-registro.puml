@@ -1,0 +1,33 @@
+﻿class Usuario {
+	+String username
+	+String email
+	+String password
+	+Boolean estaActivo
+	+registrar()
+	+iniciarSesion()
+}
+
+class Credenciales {
+	+String identificador
+	+String password
+	+Boolean recordarSesion
+}
+
+class ValidacionPassword {
+	+Boolean minOchoCaracteres
+	+Boolean tieneMayuscula
+	+Boolean tieneMinuscula
+	+Boolean tieneNumero
+	+Boolean tieneCaracterEspecial
+	+validar(String password)
+}
+
+class ProveedorOAuth {
+	+String proveedorID
+	+String token
+	+autenticarConTercero()
+}
+
+Usuario "1" --> "1" Credenciales : usa para loguearse
+Usuario "1" --> "1" ValidacionPassword : debe cumplir para registrarse
+ProveedorOAuth "0..*" --> "1" Usuario : vincula con Google o Apple

@@ -1,0 +1,46 @@
+﻿@startuml
+skinparam shadowing false
+skinparam folderBackgroundColor LightCyan
+skinparam fileBackgroundColor White
+skinparam defaultTextAlignment center
+
+folder "src" {
+    
+    folder "domain\n(Modelo de Dominio)" {
+        folder "auth " {
+            file "auth.types.ts"
+            file "passwordValidator.ts"
+        }
+    }
+    
+    folder "components\n(Componentes compartidos)" {
+        folder "ui" {
+            file "Button.jsx"
+            file "Input.jsx"
+        }
+    }
+    
+    folder "views\n(Diagrama de Páginas)" {
+        folder "auth" {
+            
+            folder "layout\n(Estructura 2 columnas)" {
+                file "AuthLayout.jsx"
+                file "SideMedia.jsx"
+            }
+            
+            folder "login\n(Módulo Login)" {
+                file "LoginPage.jsx"
+                file "LoginForm.jsx"
+                file "LoginError.jsx"
+            }
+            
+            folder "register\n(Módulo Registro)" {
+                file "RegisterPage.jsx"
+                file "RegisterForm.jsx"
+                file "PasswordChecklist.jsx"
+                file "SuccessModal.jsx"
+            }
+        }
+    }
+}
+@enduml
