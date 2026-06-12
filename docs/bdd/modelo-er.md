@@ -1,0 +1,91 @@
+# Modelo ER
+
+## Alcance del modelo
+
+El modelo abarca la persistencia de datos para una plataforma de gestión de eventos. Permite registrar usuarios, categorizarlos como organizadores o administradores mediante herencia, publicar eventos (con detalles de costo, ubicación, modalidad), establecer su cronograma (calendario) y gestionar la asistencia (registro de usuarios a los eventos).
+
+## Supuestos de persistencia
+
+- La herencia entre `Usuarios`, `Organizadores` y `Administradores` se implementa compartiendo la clave primaria (el `id_usuario` actúa como PK y FK en las subclases).
+- Las fechas y horarios se almacenarán nativamente como tipos de dato `datetime` o `timestamp` para facilitar consultas cronológicas.
+- La tabla `ASISTEN` modela una relación N:M entre usuarios y eventos, y su unicidad se garantiza mediante una clave primaria compuesta de sus respectivas claves foráneas.
+
+## Entidades y relaciones
+
+```mermaid
+erDiagram
+    USUARIOS {
+        bigint id_usuario PK
+        string apellido
+        string nombre
+        string telefono
+        string direccion
+        string email
+        string estatus
+        string gustos
+    }
+
+    ORGANIZADORES {
+        bigint id_usuario PK,FK
+        string organizacion
+        string puesto
+    }
+
+    ADMINISTRADORES {
+        bigint id_usuario PK,FK
+        string super_nivel
+    }
+
+    EVENTOS {
+        bigint id_evento PK
+        bigint id_organizador FK
+        string nombre_evento
+        numeric costo
+        string reserva_evento
+        string popularidad
+        string categoria
+        string horario
+        string direccion
+        string modalidad
+        string disponibilidad
+    }
+
+    CALENDARIOS {
+        bigint id_calendario PK
+        bigint id_evento FK
+        datetime fecha_inicio
+        datetime fecha_fin
+    }
+
+    ASISTEN {
+        bigint id_usuario PK,FK
+        bigint id_evento PK,FK
+    }
+
+    USUARIOS ||--o| ORGANIZADORES : "es un"
+    USUARIOS ||--o| ADMINISTRADORES : "es un"
+    ORGANIZADORES ||--o{ EVENTOS : "crea / organiza"
+    EVENTOS ||--o{ CALENDARIOS : "se planifica en"
+    USUARIOS ||--o{ ASISTEN : "asiste"
+    EVENTOS ||--o{ ASISTEN : "registra"
+```
+
+### Explicación de las relaciones:
+* **Herencia (Usuarios -> Organizadores/Administradores):** Un usuario puede extender su perfil para convertirse en Organizador o Administrador. Comparten el mismo ID (`id_usuario`).
+* **Organizadores a Eventos (1 a N):** Un Organizador puede crear múltiples eventos, pero cada evento pertenece a un único Organizador.
+* **Eventos a Calendarios (1 a N):** Un evento puede tener una o varias entradas en el calendario (por ejemplo, si dura múltiples días en distintos bloques), vinculadas a través de `id_evento`.
+* **Usuarios a Eventos (N a M) a través de ASISTEN:** Un usuario puede asistir a múltiples eventos, y un evento puede tener muchos usuarios asistentes. La tabla asociativa `ASISTEN` resuelve esta multiplicidad.
+
+## Reglas relevantes de datos
+
+| Regla | Impacto en el esquema |
+| --- | --- |
+| Herencia exclusiva / Roles | `ORGANIZADORES` y `ADMINISTRADORES` referencian directamente a `id_usuario` de la tabla base `USUARIOS`. |
+| Relación N:M de asistencia | Se exige el uso de la tabla intermedia `ASISTEN` con PK compuesta por las FKs, para no permitir que el mismo usuario se registre dos veces en un mismo evento. |
+| Autoría de eventos obligatoria | El atributo `id_organizador` en `EVENTOS` actúa como llave foránea (FK) obligatoria. No puede existir un evento sin organizador. |
+
+## Decisiones pendientes
+
+- Determinar si se requiere guardar un historial de cambios de estado (estatus) de los usuarios o eventos.
+- Evaluar si es necesario incorporar una tabla de pagos/transacciones para los eventos que tienen un costo numérico mayor a cero.
+- Validar si la tabla `CALENDARIOS` necesitará atributos extras para eventos recurrentes (ej: reglas de repetición semanales).
